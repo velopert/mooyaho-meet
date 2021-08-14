@@ -7,7 +7,7 @@
     "@koa/router": "^10.1.0",
     "@prisma/client": "^2.29.1",
     "dotenv": "^10.0.0",
-    "koa": "^2.13.1"
+    "fastify": "^3.20.2"
   },
   "scripts": {
     "start": "node main.js"

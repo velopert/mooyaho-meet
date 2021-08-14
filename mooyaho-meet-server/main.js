@@ -1,6 +1,9 @@
 require('dotenv').config()
 
-const Koa = require('koa')
-const app = new Koa()
+const { fastify } = require('fastify')
+const routes = require('./routes')
+const app = fastify({ logger: true })
 
-app.listen(4000)
+app.register(routes)
+
+app.listen(process.env.PORT)
