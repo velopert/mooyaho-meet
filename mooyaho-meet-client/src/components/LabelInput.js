@@ -1,8 +1,8 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-function LabelInput({ label, ...rest }) {
+function LabelInput({ label, size, className, ...rest }) {
   return (
-    <Block>
+    <Block size={size} className={className}>
       <label>{label}</label>
       <input {...rest} />
     </Block>
@@ -31,6 +31,25 @@ const Block = styled.div`
   & + & {
     margin-top: 1rem;
   }
+
+  ${(props) =>
+    props.size === 'big' &&
+    css`
+      label {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 16px;
+        display: block;
+      }
+      input {
+        height: auto;
+        font-size: 48px;
+        padding: 16px 24px;
+      }
+      & + & {
+        margin-top: 32px;
+      }
+    `}
 `
 
 export default LabelInput

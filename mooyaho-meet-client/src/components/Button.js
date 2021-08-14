@@ -1,15 +1,30 @@
+import { Link } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
-function Button({ fullWidth, size, to, ...rest }) {
+function Button({ fullWidth, size, to, theme, ...rest }) {
   if (to) {
-    return <StyledLink size={size} fullWidth={fullWidth} {...rest} />
+    return (
+      <StyledLink
+        size={size}
+        fullWidth={fullWidth}
+        theme={theme}
+        {...rest}
+        to={to}
+      />
+    )
   }
   return (
-    <StyledButton size={size} fullWidth={fullWidth} {...rest}></StyledButton>
+    <StyledButton
+      size={size}
+      fullWidth={fullWidth}
+      theme={theme}
+      {...rest}
+    ></StyledButton>
   )
 }
 
 const commonStyle = css`
+  font-family: inherit;
   ${(props) =>
     props.fullWidth
       ? css`
@@ -44,9 +59,19 @@ const commonStyle = css`
       padding-left: 24px;
       padding-right: 24px;
     `}
+
+  ${(props) =>
+    props.theme === 'textOnly' &&
+    css`
+      background: none;
+      color: #333333;
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    `}
 `
 
-const StyledLink = styled.a`
+const StyledLink = styled(Link)`
   ${commonStyle}
   text-decoration: none;
   color: white;

@@ -13,7 +13,9 @@ function Home() {
       <main>
         <h2>Start your online meeting{'\n'}with Mooyaho Meet</h2>
         <Section>
-          <Button size="big">Create New Meeting</Button>
+          <Button size="big" to="/create">
+            Create New Meeting
+          </Button>
           <div className="or">OR</div>
           <Form>
             <input

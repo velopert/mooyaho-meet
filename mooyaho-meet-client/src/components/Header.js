@@ -17,7 +17,7 @@ function Header() {
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: black;
-  margin-right: 16px;
+  margin-right: 24px;
   &:hover {
     text-decoration: underline;
     color: #333333;
@@ -25,6 +25,7 @@ const StyledLink = styled(Link)`
 `
 
 const StyledHeader = styled.header`
+  z-index: 10;
   height: 64px;
   display: flex;
   align-items: center;
