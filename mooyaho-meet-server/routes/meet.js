@@ -1,4 +1,6 @@
 const fastify = require('fastify')
+const { Mooyaho } = require('mooyaho-server-sdk')
+
 /**
  * @param {fastify.FastifyInstance} fastify
  * */

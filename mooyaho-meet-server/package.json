@@ -8,10 +8,15 @@
     "@prisma/client": "^2.29.1",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
-    "fastify": "^3.20.2"
+    "fastify": "^3.20.2",
+    "fastify-plugin": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mooyaho-server-sdk": "file:.yalc/mooyaho-server-sdk",
+    "nodemon": "^2.0.12"
   },
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "dev": "nodemon main.js"
   },
   "devDependencies": {
     "prisma": "2.29.1"

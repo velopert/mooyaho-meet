@@ -4,7 +4,7 @@ const fastify = require('fastify')
  * */
 async function meRouter(fastify) {
   fastify.get('/', (request, reply) => {
-    reply.send('Hello World')
+    return request.user
   })
 }
 

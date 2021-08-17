@@ -1,6 +1,7 @@
 const fastify = require('fastify')
 const db = require('../db')
 const bcrypt = require('bcrypt')
+const { generateToken } = require('../lib/tokens')
 
 /**
  * @param {fastify.FastifyInstance} fastify
@@ -25,7 +26,13 @@ async function authRouter(fastify) {
         username: true,
       },
     })
-    return user
+    const token = await generateToken(
+      { user },
+      {
+        expiresIn: '30d',
+      }
+    )
+    return { ...user, token }
   })
   fastify.post('/login', async (request, reply) => {
     const { username, password } = request.body
@@ -37,7 +44,13 @@ async function authRouter(fastify) {
     const isMatch = await bcrypt.compare(password, user.passwordHash)
     if (isMatch) {
       const { id, username } = user
-      return { id, username } // @todo return token
+      const token = await generateToken(
+        { user: { id, username } },
+        {
+          expiresIn: '30d',
+        }
+      )
+      return { id, username, token }
     }
     reply.status(401)
     throw new Error('Login failed')
