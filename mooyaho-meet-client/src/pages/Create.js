@@ -3,10 +3,12 @@ import { customAlphabet } from 'nanoid'
 import { useEffect, useState } from 'react'
 import LabelInput from '../components/LabelInput'
 import CenterForm from '../components/CenterForm'
+import { useCreateMeet } from '../hooks/useCreateMeet'
 
 const nanoid = customAlphabet('0123456789abcdef', 6)
 
 function Create() {
+  const createMeet = useCreateMeet()
   const [form, setForm] = useState({
     name: '',
     code: '',
@@ -17,11 +19,20 @@ function Create() {
   }, [])
 
   const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    // filter out non alphanumeric
+    const value = e.target.value.replace(/[^a-z0-9]/g, '')
+
+    setForm({ ...form, [e.target.name]: value })
   }
 
   return (
-    <StyledCenterForm submitButtonText="Create">
+    <StyledCenterForm
+      submitButtonText="Create"
+      onSubmit={() => {
+        // @todo: name should be valid if not logged in
+        createMeet(form.code, form.name)
+      }}
+    >
       <LabelInput
         className="code"
         label="Meeting Code"

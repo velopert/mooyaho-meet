@@ -6,7 +6,7 @@ function Button({ fullWidth, size, to, theme, ...rest }) {
     return (
       <StyledLink
         size={size}
-        fullWidth={fullWidth}
+        $fullWidth={fullWidth}
         theme={theme}
         {...rest}
         to={to}
@@ -16,7 +16,7 @@ function Button({ fullWidth, size, to, theme, ...rest }) {
   return (
     <StyledButton
       size={size}
-      fullWidth={fullWidth}
+      $fullWidth={fullWidth}
       theme={theme}
       {...rest}
     ></StyledButton>
@@ -26,7 +26,7 @@ function Button({ fullWidth, size, to, theme, ...rest }) {
 const commonStyle = css`
   font-family: inherit;
   ${(props) =>
-    props.fullWidth
+    props.$fullWidth
       ? css`
           width: 100%;
           display: flex;

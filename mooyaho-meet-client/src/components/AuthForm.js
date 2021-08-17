@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Button from './Button'
 import LabelInput from './LabelInput'
 
-function AuthForm({ isRegister }) {
+function AuthForm({ isRegister, onSubmit }) {
   const [form, setForm] = useState({
     username: '',
     password: '',
@@ -16,8 +16,13 @@ function AuthForm({ isRegister }) {
     setForm({ ...form, [name]: value })
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSubmit(form)
+  }
+
   return (
-    <StyledForm>
+    <StyledForm onSubmit={handleSubmit}>
       <LabelInput label="Username" name="username" onChange={onChange} />
       <LabelInput label="Password" name="password" onChange={onChange} />
       {isRegister && (
