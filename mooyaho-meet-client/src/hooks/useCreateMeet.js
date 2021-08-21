@@ -3,7 +3,7 @@ import { createMeet } from '../api/meet'
 import { useMeetState } from '../contexts/MeetContext'
 
 export function useCreateMeet() {
-  const [meet, setMeet] = useMeetState()
+  const [, setMeet] = useMeetState()
   const history = useHistory()
 
   /**
@@ -12,8 +12,10 @@ export function useCreateMeet() {
    * */
   const create = async (code, name) => {
     try {
-      await createMeet(code)
-      setMeet((prev) => ({ ...prev, meet }))
+      const meetData = await createMeet(code)
+      setMeet((prev) => ({ ...prev, meet: meetData }))
+
+      console.log(code, name)
 
       // name is not given if logged in
       if (name !== '') {

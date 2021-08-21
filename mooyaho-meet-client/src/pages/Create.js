@@ -57,6 +57,8 @@ function Create() {
             e.preventDefault()
           }
         }}
+        value={form.name}
+        onChange={onChange}
       />
     </StyledCenterForm>
   )

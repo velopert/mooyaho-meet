@@ -2,6 +2,7 @@ const fastify = require('fastify')
 const db = require('../db')
 const bcrypt = require('bcrypt')
 const { generateToken } = require('../lib/tokens')
+const mooyaho = require('../lib/mooyaho')
 
 /**
  * @param {fastify.FastifyInstance} fastify
@@ -56,7 +57,15 @@ async function authRouter(fastify) {
     throw new Error('Login failed')
   })
   fastify.post('/integrate', (request, reply) => {})
-  fastify.post('/integrate-guest', (request, reply) => {})
+  fastify.post('/integrate-guest', async (request, reply) => {
+    const { sessionId, displayName } = request.body
+    const channelSession = await mooyaho.integrateUser(sessionId, {
+      id: sessionId,
+      displayName,
+      isGuest: true,
+    })
+    return channelSession
+  })
 }
 
 module.exports = authRouter

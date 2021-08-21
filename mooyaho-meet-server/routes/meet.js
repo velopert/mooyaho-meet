@@ -1,12 +1,6 @@
 const fastify = require('fastify')
-const { Mooyaho } = require('mooyaho-server-sdk')
 const db = require('../db')
-
-const mooyaho = new Mooyaho(
-  'http://localhost:8080',
-  'ec24c791f058b01abccc8e3c5e8cd50b'
-)
-
+const mooyaho = require('../lib/mooyaho')
 /**
  * @param {fastify.FastifyInstance} fastify
  * */

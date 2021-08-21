@@ -2,7 +2,12 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 import Button from './Button'
 
-function CenterForm({ className, onSubmit, submitButtonText, children }) {
+function CenterForm({
+  className,
+  onSubmit,
+  submitButtonText = 'Ok',
+  children,
+}) {
   const history = useHistory()
 
   return (
