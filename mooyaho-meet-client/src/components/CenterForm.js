@@ -22,6 +22,7 @@ function CenterForm({
         <div className="buttons">
           <Button
             size="big"
+            type="reset"
             theme="textOnly"
             onClick={(e) => {
               e.preventDefault()
@@ -30,7 +31,9 @@ function CenterForm({
           >
             Cancel
           </Button>
-          <Button size="big">{submitButtonText}</Button>
+          <Button size="big" type="submit">
+            {submitButtonText}
+          </Button>
         </div>
       </form>
     </Block>

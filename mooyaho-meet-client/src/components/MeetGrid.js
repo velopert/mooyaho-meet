@@ -4,12 +4,11 @@ import MeetGridItem from './MeetGridItem'
 
 function MeetGrid({ sessions }) {
   const [itemWidth, setItemWidth] = useState(0)
-  const [count, setCount] = useState(1)
   const ref = useRef()
 
   const divisor = useMemo(() => {
-    return Math.ceil(Math.sqrt(count))
-  }, [count])
+    return Math.ceil(Math.sqrt(sessions.length)) || 1
+  }, [sessions.length])
 
   useLayoutEffect(() => {
     const gridWidth = ref.current.clientWidth
@@ -19,15 +18,16 @@ function MeetGrid({ sessions }) {
   return (
     <Grid ref={ref}>
       {sessions.map((session, i) => {
-        const remainder = count % divisor
-        const isLastRow = i >= count - remainder
+        const remainder = sessions.length % divisor
+        const isLastRow = i >= sessions.length - remainder
         return (
           <MeetGridItem
             width={itemWidth}
-            key={session.sessionId}
+            key={session.id}
             stream={session.stream}
             isMySelf={session.isMySelf}
             isLastRow={isLastRow}
+            displayName={session.user.displayName}
           />
         )
       })}

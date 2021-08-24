@@ -1,4 +1,4 @@
-import { Redirect, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import styled from 'styled-components'
 import MeetGrid from '../components/MeetGrid'
 import Mooyaho from 'mooyaho-client-sdk'
@@ -7,6 +7,9 @@ import { integrateGuest } from '../api/auth'
 import { useMeetState } from '../contexts/MeetContext'
 import MeetReady from '../components/MeetReady'
 import { getMeet } from '../api/meet'
+import FooterButtonGroup from '../components/FooterButtonGroup'
+import MyCameraViewer from '../components/FloatingVideo'
+import { useDetectVolume } from '../hooks/useDetectVolume'
 
 function Meet() {
   const params = useParams()
@@ -16,14 +19,21 @@ function Meet() {
   const [myStream, setMyStream] = useState(null)
   const [sessions, setSessions] = useState([])
   const [mySessionId, setMySessionId] = useState(null)
+  const [{ muted, videoDisabled }, setMediaState] = useState({
+    muted: false,
+    videoDisabled: false,
+  })
+  useDetectVolume(sessions)
 
   useEffect(() => {
     const process = async () => {
       const mooyaho = new Mooyaho({
         url: 'ws://localhost:8080',
       })
+
+      client.current = mooyaho
       const stream = await mooyaho.createUserMedia({
-        video: true,
+        video: { width: { max: 480 }, frameRate: 10 },
         audio: true,
       })
       setMyStream(stream)
@@ -38,12 +48,58 @@ function Meet() {
         setMeet((prev) => ({ ...prev, meet: meetData }))
         mooyaho.enter(meetData.channelId)
       }
+
+      window.mooyaho = mooyaho
+
+      mooyaho.addEventListener('enterSuccess', (event) => {
+        const sessions = mooyaho.sessionsArray
+          .filter((s) => s.id !== sessionId) // sessions without userself
+          .map((s) => ({ ...s, stream: null }))
+
+        console.log(mooyaho.sessionsArray)
+        setSessions(sessions)
+      })
+
+      mooyaho.addEventListener('entered', (e) => {
+        if (e.isSelf) return
+        setSessions((prev) =>
+          prev.concat({ id: e.sessionId, user: e.user, stream: null })
+        )
+      })
+
+      mooyaho.addEventListener('remoteStreamChanged', (e) => {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === e.sessionId
+              ? {
+                  ...s,
+                  stream: mooyaho.getRemoteStreamById(e.sessionId),
+                }
+              : s
+          )
+        )
+      })
+
+      mooyaho.addEventListener('left', (e) => {
+        setSessions((prev) => prev.filter((s) => s.id !== e.sessionId))
+      })
     }
+
+    // handle enterSuccess
+
     if (processed.current) return
     if (!name) return
     process()
     processed.current = true
   }, [name, meet, params.slug, setMeet])
+
+  useEffect(() => {
+    return () => {
+      if (client.current) {
+        client.current.dispose()
+      }
+    }
+  }, [])
 
   const sessionItems = useMemo(() => {
     if (!myStream || !mySessionId) return []
@@ -52,12 +108,30 @@ function Meet() {
         {
           isMySelf: true,
           stream: myStream,
-          sessionId: mySessionId,
+          id: mySessionId,
+          user: {
+            displayName: 'Me',
+          },
         },
       ]
     }
     return sessions
   }, [sessions, myStream, mySessionId])
+
+  const onToggleMuted = () => {
+    const nextValue = !muted
+    setMediaState((prev) => ({ ...prev, muted: nextValue }))
+    const audioTrack = myStream?.getAudioTracks()[0]
+    if (!audioTrack) return
+    audioTrack.enabled = !nextValue
+  }
+  const onToggleVideoDisabled = () => {
+    const nextValue = !videoDisabled
+    setMediaState((prev) => ({ ...prev, videoDisabled: nextValue }))
+    const videoTrack = myStream?.getVideoTracks()[0]
+    if (!videoTrack) return
+    videoTrack.enabled = !nextValue
+  }
 
   if (!name) {
     return <MeetReady />
@@ -67,12 +141,20 @@ function Meet() {
     <Fullscreen>
       <main>
         <MeetGrid sessions={sessionItems} />
+        <MyCameraViewer stream={myStream} visible={sessions.length !== 0} />
       </main>
       <footer>
         <div className="left">
           <div className="meetId">{params.slug}</div>
         </div>
-        <div className="center">😇</div>
+        <div className="center">
+          <FooterButtonGroup
+            muted={muted}
+            videoDisabled={videoDisabled}
+            onToggleMuted={onToggleMuted}
+            onToggleVideoDisabled={onToggleVideoDisabled}
+          />
+        </div>
         <div className="right">😇</div>
       </footer>
     </Fullscreen>
@@ -85,6 +167,7 @@ const Fullscreen = styled.div`
   display: flex;
   flex-direction: column;
   main {
+    position: relative;
     flex: 1;
     min-height: 0;
   }
