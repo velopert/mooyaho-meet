@@ -9,7 +9,6 @@ import MeetReady from '../components/MeetReady'
 import { getMeet } from '../api/meet'
 import FooterButtonGroup from '../components/FooterButtonGroup'
 import MyCameraViewer from '../components/FloatingVideo'
-import { useDetectVolume } from '../hooks/useDetectVolume'
 
 function Meet() {
   const params = useParams()
@@ -23,7 +22,6 @@ function Meet() {
     muted: false,
     videoDisabled: false,
   })
-  useDetectVolume(sessions)
 
   useEffect(() => {
     const process = async () => {
@@ -63,7 +61,15 @@ function Meet() {
       mooyaho.addEventListener('entered', (e) => {
         if (e.isSelf) return
         setSessions((prev) =>
-          prev.concat({ id: e.sessionId, user: e.user, stream: null })
+          prev.concat({
+            id: e.sessionId,
+            user: e.user,
+            stream: null,
+            state: {
+              muted: false,
+              videoOff: false,
+            },
+          })
         )
       })
 
@@ -78,6 +84,22 @@ function Meet() {
               : s
           )
         )
+      })
+
+      mooyaho.addEventListener('updatedMediaState', (e) => {
+        setSessions((prev) => {
+          return prev.map((s) =>
+            s.id === e.sessionId
+              ? {
+                  ...s,
+                  state: {
+                    ...s.state,
+                    [e.key]: e.value,
+                  },
+                }
+              : s
+          )
+        })
       })
 
       mooyaho.addEventListener('left', (e) => {
@@ -112,15 +134,20 @@ function Meet() {
           user: {
             displayName: 'Me',
           },
+          state: {
+            muted,
+            videoOff: videoDisabled,
+          },
         },
       ]
     }
     return sessions
-  }, [sessions, myStream, mySessionId])
+  }, [sessions, myStream, mySessionId, muted, videoDisabled])
 
   const onToggleMuted = () => {
     const nextValue = !muted
     setMediaState((prev) => ({ ...prev, muted: nextValue }))
+    client.current?.updateMediaState('muted', nextValue)
     const audioTrack = myStream?.getAudioTracks()[0]
     if (!audioTrack) return
     audioTrack.enabled = !nextValue
@@ -128,6 +155,7 @@ function Meet() {
   const onToggleVideoDisabled = () => {
     const nextValue = !videoDisabled
     setMediaState((prev) => ({ ...prev, videoDisabled: nextValue }))
+    client.current?.updateMediaState('videoOff', nextValue)
     const videoTrack = myStream?.getVideoTracks()[0]
     if (!videoTrack) return
     videoTrack.enabled = !nextValue
@@ -136,6 +164,8 @@ function Meet() {
   if (!name) {
     return <MeetReady />
   }
+
+  console.log(sessionItems)
 
   return (
     <Fullscreen>

@@ -53,7 +53,7 @@ export function detectVolume(stream, callback, muteCallback) {
     if (!muted) {
       if (average < 0.00015) {
         muteCounter += 1
-        if (muteCounter > 1) {
+        if (muteCounter > 5) {
           muted = true
           muteCallback(true)
           muteCounter = 0

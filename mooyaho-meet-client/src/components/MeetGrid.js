@@ -28,6 +28,8 @@ function MeetGrid({ sessions }) {
             isMySelf={session.isMySelf}
             isLastRow={isLastRow}
             displayName={session.user.displayName}
+            muted={session.state.muted}
+            videoOff={session.state.videoOff}
           />
         )
       })}
