@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useHistory } from 'react-router'
 import styled from 'styled-components'
 import Button from '../components/Button'
 import Header from '../components/Header'
 
 function Home() {
+  const history = useHistory()
   const [value, setValue] = useState('')
   const [focused, setFocused] = useState('')
 
@@ -17,7 +19,12 @@ function Home() {
             Create New Meeting
           </Button>
           <div className="or">OR</div>
-          <Form>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault()
+              history.push(`/meet/${value}`)
+            }}
+          >
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
