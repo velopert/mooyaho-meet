@@ -53,9 +53,10 @@ function Meet() {
       window.mooyaho = mooyaho
 
       mooyaho.addEventListener('enterSuccess', (event) => {
-        const sessions = mooyaho.sessionsArray
-          .filter((s) => s.id !== sessionId) // sessions without userself
-          .map((s) => ({ ...s, stream: null }))
+        const sessions = mooyaho.sessionsArray.map((s) => ({
+          ...s,
+          stream: null,
+        }))
 
         console.log(mooyaho.sessionsArray)
         setSessions(sessions)
@@ -128,24 +129,13 @@ function Meet() {
 
   const sessionItems = useMemo(() => {
     if (!myStream || !mySessionId) return []
-    if (sessions.length === 0) {
-      return [
-        {
-          isMySelf: true,
-          stream: myStream,
-          id: mySessionId,
-          user: {
-            displayName: 'Me',
-          },
-          state: {
-            muted,
-            videoOff: videoDisabled,
-          },
-        },
-      ]
+
+    if (sessions.length === 1) {
+      return [{ ...sessions[0], isMySelf: true, stream: myStream }]
     }
-    return sessions
-  }, [sessions, myStream, mySessionId, muted, videoDisabled])
+
+    return sessions.filter((s) => s.id !== mySessionId)
+  }, [sessions, myStream, mySessionId])
 
   const onToggleMuted = () => {
     const nextValue = !muted
@@ -175,11 +165,20 @@ function Meet() {
   return (
     <Fullscreen>
       <Wrapper>
-        <main>
+        <main
+          onClick={() => {
+            setSidebarOpen(false)
+          }}
+        >
           <MeetGrid sessions={sessionItems} sidebarOpen={sidebarOpen} />
-          <MyCameraViewer stream={myStream} visible={sessions.length !== 0} />
+          <MyCameraViewer stream={myStream} visible={sessions.length > 1} />
         </main>
-        <Sidebar visible={sidebarOpen} onClose={onToggleSidebar} />
+        <Sidebar
+          visible={sidebarOpen}
+          onClose={onToggleSidebar}
+          sessions={sessions}
+          mySessionId={mySessionId}
+        />
       </Wrapper>
       <footer>
         <div className="left">
@@ -194,10 +193,7 @@ function Meet() {
           />
         </div>
         <div className="right">
-          <UsersButton
-            usersCount={sessions.length + 1}
-            onClick={onToggleSidebar}
-          />
+          <UsersButton usersCount={sessions.length} onClick={onToggleSidebar} />
         </div>
       </footer>
     </Fullscreen>

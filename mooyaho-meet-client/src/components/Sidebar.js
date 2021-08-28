@@ -1,7 +1,8 @@
 import styled, { css } from 'styled-components'
 import { CloseIcon } from '../assets/icons'
+import UserItem from './UserItem'
 
-function Sidebar({ visible, onClose }) {
+function Sidebar({ visible, onClose, sessions, mySessionId }) {
   return (
     <Aside visible={visible}>
       <div className="content">
@@ -11,6 +12,18 @@ function Sidebar({ visible, onClose }) {
             <CloseIcon />
           </button>
         </header>
+        <div className="users">
+          <div className="scroll">
+            {sessions.map((s) => (
+              <UserItem
+                key={s.id}
+                displayName={s.user.displayName}
+                isMySelf={s.id === mySessionId}
+                muted={s.state.muted}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </Aside>
   )
@@ -37,6 +50,8 @@ const Aside = styled.aside`
     border-left-width: 4px;
     background: white;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 
     header {
       border-bottom: 1px solid #efefef;
@@ -57,6 +72,23 @@ const Aside = styled.aside`
       h3 {
         font-size: 24px;
         margin: 0;
+      }
+    }
+
+    .users {
+      flex: 1;
+      position: relative;
+      .scroll {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        .item {
+          width: 100%;
+          height: 56px;
+
+          border: 1px solid white;
+        }
       }
     }
   }
