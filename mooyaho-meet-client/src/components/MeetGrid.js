@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import MeetGridItem from './MeetGridItem'
 
-function MeetGrid({ sessions }) {
+function MeetGrid({ sessions, sidebarOpen }) {
   const [itemWidth, setItemWidth] = useState(0)
   const ref = useRef()
 
@@ -11,9 +11,11 @@ function MeetGrid({ sessions }) {
   }, [sessions.length])
 
   useLayoutEffect(() => {
-    const gridWidth = ref.current.clientWidth
+    const gridWidth = sidebarOpen
+      ? document.body.offsetWidth - 320
+      : document.body.offsetWidth
     setItemWidth(gridWidth / divisor)
-  }, [divisor])
+  }, [divisor, sidebarOpen])
 
   return (
     <Grid ref={ref}>
@@ -33,11 +35,6 @@ function MeetGrid({ sessions }) {
           />
         )
       })}
-      {/* {list.map((i) => {
-        const remainder = count % divisor
-        const isLastRow = i >= count - remainder
-        return <MeetGridItem width={itemWidth} isLastRow={isLastRow} />
-      })} */}
     </Grid>
   )
 }

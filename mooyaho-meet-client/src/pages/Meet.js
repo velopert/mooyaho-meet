@@ -9,6 +9,8 @@ import MeetReady from '../components/MeetReady'
 import { getMeet } from '../api/meet'
 import FooterButtonGroup from '../components/FooterButtonGroup'
 import MyCameraViewer from '../components/FloatingVideo'
+import UsersButton from '../components/UsersButton'
+import Sidebar from '../components/Sidebar'
 
 function Meet() {
   const params = useParams()
@@ -22,6 +24,7 @@ function Meet() {
     muted: false,
     videoDisabled: false,
   })
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const process = async () => {
@@ -161,18 +164,23 @@ function Meet() {
     videoTrack.enabled = !nextValue
   }
 
+  const onToggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
   if (!name) {
     return <MeetReady />
   }
 
-  console.log(sessionItems)
-
   return (
     <Fullscreen>
-      <main>
-        <MeetGrid sessions={sessionItems} />
-        <MyCameraViewer stream={myStream} visible={sessions.length !== 0} />
-      </main>
+      <Wrapper>
+        <main>
+          <MeetGrid sessions={sessionItems} sidebarOpen={sidebarOpen} />
+          <MyCameraViewer stream={myStream} visible={sessions.length !== 0} />
+        </main>
+        <Sidebar visible={sidebarOpen} onClose={onToggleSidebar} />
+      </Wrapper>
       <footer>
         <div className="left">
           <div className="meetId">{params.slug}</div>
@@ -185,7 +193,12 @@ function Meet() {
             onToggleVideoDisabled={onToggleVideoDisabled}
           />
         </div>
-        <div className="right">😇</div>
+        <div className="right">
+          <UsersButton
+            usersCount={sessions.length + 1}
+            onClick={onToggleSidebar}
+          />
+        </div>
       </footer>
     </Fullscreen>
   )
@@ -197,9 +210,11 @@ const Fullscreen = styled.div`
   display: flex;
   flex-direction: column;
   main {
+    height: 100%;
     position: relative;
     flex: 1;
     min-height: 0;
+    overflow: hidden;
   }
   footer {
     display: flex;
@@ -227,5 +242,11 @@ const Fullscreen = styled.div`
       font-weight: bold;
     }
   }
+`
+
+const Wrapper = styled.div`
+  flex: 1;
+  width: 100%;
+  display: flex;
 `
 export default Meet
