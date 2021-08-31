@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import {
+  CallEndIcon,
   MicIcon,
   MicOffIcon,
   VideocamIcon,
@@ -12,6 +13,7 @@ function FooterButtonGroup({
   videoDisabled,
   onToggleMuted,
   onToggleVideoDisabled,
+  onHangOff,
 }) {
   return (
     <Group>
@@ -33,6 +35,9 @@ function FooterButtonGroup({
           <VideocamIcon />
         </IconCircleButton>
       )}
+      <CallEndButton onClick={onHangOff}>
+        <CallEndIcon />
+      </CallEndButton>
     </Group>
   )
 }
@@ -46,6 +51,10 @@ const RedButton = styled(IconCircleButton)`
   &:hover {
     background: #f44336;
   }
+`
+
+const CallEndButton = styled(RedButton)`
+  width: 64px;
 `
 
 export default FooterButtonGroup

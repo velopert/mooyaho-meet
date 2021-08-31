@@ -12,6 +12,7 @@
     "fastify-plugin": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "mooyaho-server-sdk": "file:.yalc/mooyaho-server-sdk",
+    "node-cron": "^3.0.0",
     "nodemon": "^2.0.12"
   },
   "scripts": {

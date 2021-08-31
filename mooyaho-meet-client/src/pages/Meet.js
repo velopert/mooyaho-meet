@@ -1,4 +1,4 @@
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import styled from 'styled-components'
 import MeetGrid from '../components/MeetGrid'
 import Mooyaho from 'mooyaho-client-sdk'
@@ -11,6 +11,8 @@ import FooterButtonGroup from '../components/FooterButtonGroup'
 import MyCameraViewer from '../components/FloatingVideo'
 import UsersButton from '../components/UsersButton'
 import Sidebar from '../components/Sidebar'
+import Spinner from '../components/Spinner'
+import ErrorBox from '../components/ErrorBox'
 
 function Meet() {
   const params = useParams()
@@ -25,6 +27,28 @@ function Meet() {
     videoDisabled: false,
   })
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [error, setError] = useState(false)
+  const history = useHistory()
+
+  const hangOff = () => {
+    const mooyaho = client.current
+    history.replace('/')
+    if (!mooyaho) return
+    mooyaho.leave()
+  }
+
+  useEffect(() => {
+    if (meet) return
+    const process = async () => {
+      try {
+        const meetData = await getMeet(params.slug)
+        setMeet((prev) => ({ ...prev, meet: meetData }))
+      } catch (e) {
+        setError(true)
+      }
+    }
+    process()
+  }, [meet, params.slug, setMeet])
 
   useEffect(() => {
     const process = async () => {
@@ -124,8 +148,12 @@ function Meet() {
       if (client.current) {
         client.current.dispose()
       }
+      setMeet({
+        meet: null,
+        name: '',
+      })
     }
-  }, [])
+  }, [setMeet])
 
   const sessionItems = useMemo(() => {
     if (!myStream || !mySessionId) return []
@@ -156,6 +184,18 @@ function Meet() {
 
   const onToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
+  }
+
+  if (error) {
+    return <ErrorBox />
+  }
+
+  if (!meet) {
+    return (
+      <SpinnerWrapper>
+        <Spinner size={48} />
+      </SpinnerWrapper>
+    )
   }
 
   if (!name) {
@@ -190,6 +230,7 @@ function Meet() {
             videoDisabled={videoDisabled}
             onToggleMuted={onToggleMuted}
             onToggleVideoDisabled={onToggleVideoDisabled}
+            onHangOff={hangOff}
           />
         </div>
         <div className="right">
@@ -243,6 +284,15 @@ const Fullscreen = styled.div`
 const Wrapper = styled.div`
   flex: 1;
   width: 100%;
+  display: flex;
+`
+
+const SpinnerWrapper = styled.div`
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
   display: flex;
 `
 export default Meet
